@@ -27,15 +27,11 @@
 (defn create-formatted-log-string
 "Formats a single line string containing info about an access to counter."
 [log-entry]
-  (let 
-    [
-      sec-str (format "Counter value: %10d   Time: %7.3f sec   %s"
-          (long (log-entry :counter-val))
-          (double (/ (log-entry :time) 1000))
-          (log-entry :thread-name)
-      )
-    ]
-    sec-str
+  
+  (format "Counter value: %10d   Time: %7.3f sec   %s"
+      (long (log-entry :counter-val))
+      (double (/ (log-entry :time) 1000))
+      (log-entry :thread-name)
   )
 )
 
