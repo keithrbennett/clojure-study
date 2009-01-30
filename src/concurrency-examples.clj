@@ -73,7 +73,7 @@ on a single thread."
   ; Put println in a transaction so the output from the multiple threads
   ; do not get interleaved.  The flush is there so that the string and its
   ; new line are output before the next print begins.  (Without the flush,
-  ; every 5 or so runs resulted in twi entries on one line, and then an
+  ; every 5 or so runs resulted in two entries on one line, and then an
   ; empty blank line.)
   (dosync (println (str "Thread done: "(Thread/currentThread))) flush)
 )
