@@ -71,7 +71,8 @@ on a single thread."
   ; new line are output before the next print begins.  (Without the flush,
   ; every 5 or so runs resulted in two entries on one line, and then an
   ; empty blank line.)
-  (dosync (println (str "Thread done: "(Thread/currentThread))) flush)
+  (println (str "Thread done: "(Thread/currentThread)))
+  (flush)
 )
 
 
