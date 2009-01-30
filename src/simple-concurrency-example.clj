@@ -99,7 +99,7 @@ the list of resulting log entries."
       )
     )
   )
-  (reverse @log)
+  (seq @log)
 )
 
 
