@@ -122,10 +122,8 @@ the list of resulting log entries."
 
   (let [
     counter-vals (map #(:counter-val %) log)
-    num-counter-vals (count counter-vals)
-    num-distinct-counter-vals (count (distinct counter-vals))
   ]
-    (assert (= num-counter-vals num-distinct-counter-vals))
+    (assert (= (count counter-vals) (count (distinct counter-vals))))
     (println "Passed: all values are distinct.")
   )
 )
