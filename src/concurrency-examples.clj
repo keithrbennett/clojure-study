@@ -3,13 +3,15 @@
 
 (ns concurrency-example)
 
+; Times logged will be expressed in milliseconds after this time.
 (def reference-time (System/currentTimeMillis))
 
 
-(defn create-log-entry [counter-val]
+(defn create-formatted-log-string
+"Formats a single line string containing info about an access to counter."
+[counter-val msec-elapsed]
   (let 
     [
-      msec-elapsed (- (System/currentTimeMillis) reference-time)
       sec-str (format "Counter value: %10d   Time: %12.3f sec    Thread: %s"
           (long counter-val)
           (double (/ msec-elapsed 1000))
@@ -20,15 +22,21 @@
   )
 )
 
-(defstruct entry :counter-val :time :thread-name)
 
+(defstruct log-entry :counter-val :time :thread-name)
+
+
+; This is the thing whose concurrent access will be demonstrated.
 (def counter (ref 0))
+
+
+; Will contain a list of log entries relating to accesses to counter.
 (def log (ref ()))
 
 
 (defn do-loop 
-"Runs the counter increment and state recording num-iterations times,
-and returns a list of status struct result objects."
+"Runs the counter increment test and its logging num-iterations times
+on a single thread."
 [num-iterations] 
   (loop [i num-iterations]
     (if (zero? i)
@@ -38,9 +46,10 @@ and returns a list of status struct result objects."
           (let [
             counter-val (alter counter inc)
             thread-name (str (Thread/currentThread))
-            e (struct entry @counter (- (System/currentTimeMillis) reference-time) thread-name)
-            ]
-            (println e) (flush)
+            tm (- (System/currentTimeMillis) reference-time)
+            e (struct log-entry counter-val tm thread-name)
+          ]
+            (println (create-formatted-log-string counter-val tm)) (flush)
             (alter log conj e)
           )
         )
@@ -53,12 +62,6 @@ and returns a list of status struct result objects."
 )
 
 
-(defn create-loop-fn [times] (fn [] (do-loop times)))
-
-
-(def conc-test (create-loop-fn 5))
-
-
 (defn run-test [num-threads]
   (loop [i 0 threads ()]
     (if (= i num-threads)
@@ -67,7 +70,9 @@ and returns a list of status struct result objects."
         (println "All " (count threads) " threads joined.")
         (println @log)
       )
-      (let [t (Thread. conc-test)]
+      (let [
+        f #(do-loop 5)
+        t (Thread. f)]
         (. t start)
         (recur (inc i) (conj threads t))
       )
