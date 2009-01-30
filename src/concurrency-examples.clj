@@ -38,23 +38,21 @@
 "Runs the counter increment test and its logging num-iterations times
 on a single thread."
 [num-iterations] 
-  (loop [i num-iterations]
-    (if (zero? i)
-      nil
-      (do
-        (dosync
-          (let [
-            counter-val (alter counter inc)
-            thread-name (str (Thread/currentThread))
-            tm (- (System/currentTimeMillis) reference-time)
-            e (struct log-entry counter-val tm thread-name)
-          ]
-            (println (create-formatted-log-string counter-val tm)) (flush)
-            (alter log conj e)
-          )
+  (dotimes [i num-iterations]
+    (do
+      (dosync
+        (let [
+          counter-val (alter counter inc)
+          thread-name (str (Thread/currentThread))
+          tm (- (System/currentTimeMillis) reference-time)
+          e (struct log-entry counter-val tm thread-name)
+        ]
+          (println (create-formatted-log-string counter-val tm)) (flush)
+          (alter log conj e)
         )
-        (Thread/sleep 500)
-        (recur (dec i))
+      )
+      (Thread/sleep 500)
+      (recur (dec i))
       )
     )
   )
