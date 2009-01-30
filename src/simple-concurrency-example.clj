@@ -17,7 +17,7 @@
 
 
 ; Will contain a list of log entries relating to accesses to counter.
-(def log (ref ()))
+(def log (ref []))
 
 
 ; Times logged will be expressed in milliseconds after this time.
@@ -53,10 +53,6 @@ on a single thread."
         entry (struct log-entry counter-val tm thread-name)
       ]
         (println (create-formatted-log-string entry))
-
-        ; Conjoin the log entry to the list.  It will be added to the head of
-        ; the list, so we will reverse the list later to preserve ascending
-        ; chronological order.
         (alter log conj entry)
       )
     )
